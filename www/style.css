@@ -1,0 +1,12 @@
+.custom-control {
+  display : none;
+}
+
+.gray-hr {
+  border-top: 1px solid gray;
+}
+
+.center{
+  text-align: center;
+  margin: auto;
+}
