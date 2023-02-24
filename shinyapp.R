@@ -1,6 +1,6 @@
 library(ranger)
 # set as working directory
-train_x_learner <- list(
+train_x_learner_fit <- list(
   xf0 = readRDS("xf0.rds"),
   xf1 = readRDS("xf1.rds"),
   mapping0 = readRDS("mapping0.rds"),
@@ -11,6 +11,14 @@ train_x_learner <- list(
 
 ## Predict score
 predict_x_learner_fit <- predict_x_learner(test_imputed[, c(covariates_factor, covariates_numeric)], W = 1, FALSE, TRUE)
+covariates_factor <- c('SEX',  "DIABETES", "DIABETES.INSULIN", "DYSLIPIDEMIA", "HTN", "PRIOR.MI", "PRIOR.PCI", "PRIOR.STROKE", "stable.cad", "unstable.cad", "nstemi",
+                       "stemi", "MVD.YN", "PCI.LM.YN", "SMOKING", "MVD.PCI.YN")
+covariates_numeric <- c( "AGE", "IMPLANTED.STENT.NO", "TOTAL.STENT.LENGTH",  "BASELINE.HEMOGLOBIN", "WBC.COUNT", "BMI", "STENT.LESION.NO")
+# w 는 1이던 2던 상관 없음. 
+# 하나하나가 score.
+
+++ test_imputed 를 보내주면 -> 가명처리 해서 보내줄 예정
+++ score 가 나오면 
 
 # > covariates_factor
 #  [1] "SEX"              "DIABETES"         "DIABETES.INSULIN" "DYSLIPIDEMIA"     "HTN"              "PRIOR.MI"         "PRIOR.PCI"        "PRIOR.STROKE"     "stable.cad"       "unstable.cad"     "nstemi"
