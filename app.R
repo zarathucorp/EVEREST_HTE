@@ -2,7 +2,7 @@
 library(shiny)
 library(bs4Dash)
 library(shinyWidgets)
-
+library(reactable)
 # library for Server
 library(ranger)
 
@@ -68,18 +68,36 @@ predict_x_learner <- function(X, W, estimate_propensities, predict_oob) {
   return(preds)
 }
 
-
 headerUI <- function() {
   dashboardHeader(
     title = dashboardBrand(
-      title = "EVEREST-HTE",
+      title = "iDAPT tool",
       color = "olive",
-      href = "https://github.com/dr-you-group/EVEREST-HTE",
-      image = "https://github.com/zarathucorp/EVEREST_HTE/raw/main/img/icon.png"
+      href = "https://github.com/dr-you-group/EVEREST-HTE" # ,
+      # image = "https://github.com/zarathucorp/EVEREST_HTE/raw/main/img/icon.png"
     ),
     skin = "dark",
     status = "gray-dark",
-    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css"))
+    tags$head(
+      tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+    ),
+    tags$head(
+      tags$link(rel = "shortcut icon", href = "https://github.com/zarathucorp/EVEREST_HTE/raw/main/img/favicon.ico", type = "image/x-icon")
+    )
+  )
+}
+
+myUI <- function(title, UI) {
+  fluidRow(
+    class = "left",
+    column(
+      width = 6,
+      tags$b(title)
+    ),
+    column(
+      width = 6,
+      UI
+    )
   )
 }
 
@@ -91,167 +109,188 @@ inputUI <- function() {
       title = NULL,
       collapsible = FALSE,
       headerBorder = FALSE,
-      status = "info",
+      status = "success",
       solidHeader = FALSE,
       fluidRow(
         class = "center",
-        # Factor
         column(
           width = 6,
-          numericInputIcon(
-            inputId = "age",
-            label = "Age",
-            value = NULL,
-            min = 1,
-            max = 100,
-            step = 1,
-            size = "sm"
+          actionBttn(
+            inputId = "reset",
+            label = "Reset",
+            style = "material-flat",
+            color = "default",
+            block = TRUE
           )
         ),
         column(
           width = 6,
-          radioGroupButtons(
-            inputId = "sex",
-            label = "Sex",
-            choices = c("Male" = 0, "Female" = 1),
-            status = "info",
-            justified = TRUE,
-            size = "sm"
-          )
-        )
-      ),
-      fluidRow(
-        class = "center",
-        column(
-          width = 4,
-          numericInputIcon(
-            inputId = "bmi",
-            size = "sm",
-            label = "BMI",
-            value = NULL,
-            min = 0,
-            max = 50,
-            step = .1
-          )
-        ),
-        column(
-          width = 4,
-          numericInputIcon(
-            inputId = "hb",
-            size = "sm",
-            label = "Hemoglobin",
-            value = NULL,
-            min = 1,
-            max = 100,
-            step = .01,
-            icon = list(NULL, "g/dL")
-          )
-        ),
-        column(
-          width = 4,
-          numericInputIcon(
-            inputId = "wbc",
-            label = "WBC.Count",
-            value = NULL,
-            min = 1,
-            max = 100,
-            step = .01,
-            size = "sm"
-          ),
-        )
-      ),
-      fluidRow(
-        class = "center",
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "dys",
-            label = "Dyslipidemia",
-            choices = c("Y" = 1, "N" = 0),
-            status = "success",
-            justified = TRUE,
-            size = "sm"
-          )
-        ),
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "htn",
-            label = "HTN",
-            choices = c("Y" = 1, "N" = 0),
-            status = "danger",
-            justified = TRUE,
-            size = "sm"
-          )
-        ),
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "smoke",
-            label = "Smoker",
-            status = "success",
-            choices = c("Y" = 1, "N" = 0),
-            justified = TRUE,
-            size = "sm"
+          actionBttn(
+            inputId = "calculate",
+            label = "Calculate",
+            style = "material-flat",
+            color = "success",
+            block = TRUE
           )
         )
       ),
       hr(class = "gray-hr"),
-      fluidRow(
-        class = "center",
-        column(
-          width = 6,
-          radioGroupButtons(
-            inputId = "dia",
-            label = "Diabetes",
-            choices = c("Y" = 1, "N" = 0),
-            status = "warning",
-            justified = TRUE
-          )
-        ),
-        column(
-          width = 6,
-          radioGroupButtons(
-            inputId = "dia.i",
-            label = "Diabetes (insulin)",
-            choices = c("Y" = 1, "N" = 0),
-            status = "primary",
-            justified = TRUE
-          )
+      myUI(
+        title = "Age",
+        UI = numericInputIcon(
+          inputId = "age",
+          label = NULL,
+          value = 60,
+          min = 1,
+          max = 100,
+          step = 1,
+          size = "sm"
         )
       ),
-      hr(class = "gray-hr"),
-      fluidRow(
-        class = "center",
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "mi",
-            label = "Prior.MI",
-            choices = c("O" = 1, "X" = 0),
-            status = "success",
-            justified = TRUE
-          )
-        ),
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "pci",
-            label = "Prior.PCI",
-            choices = c("Y" = 1, "N" = 0),
-            status = "success",
-            justified = TRUE
-          )
-        ),
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "stroke",
-            label = "Prior.Stroke",
-            choices = c("Y" = 1, "N" = 0),
-            status = "success",
-            justified = TRUE
-          )
+      myUI(
+        title = "Sex",
+        UI = radioGroupButtons(
+          inputId = "sex",
+          label = NULL,
+          choices = c("Male" = 0, "Female" = 1),
+          selected = 0,
+          status = "success",
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        title = "Body mass index",
+        UI = numericInputIcon(
+          inputId = "bmi",
+          size = "sm",
+          label = NULL,
+          value = 25,
+          min = 0,
+          max = 50,
+          step = .1
+        )
+      ),
+      myUI(
+        title = "Hemoglobin",
+        UI = numericInputIcon(
+          inputId = "hb",
+          size = "sm",
+          label = NULL,
+          value = 13.5,
+          min = 1,
+          max = 100,
+          step = .1,
+          icon = list(NULL, "g/dL")
+        )
+      ),
+      myUI(
+        "White Blood Cells",
+        numericInputIcon(
+          inputId = "wbc",
+          label = NULL,
+          value = 9,
+          min = 1,
+          max = 100,
+          step = .1,
+          size = "sm",
+          icon = list(NULL, "10³/μL")
+        )
+      ),
+      myUI(
+        "Dyslipidemia",
+        radioGroupButtons(
+          inputId = "dys",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          status = "success",
+          selected = 1,
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Hypertension",
+        radioGroupButtons(
+          inputId = "htn",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          status = "success",
+          selected = 1,
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Current Smoker",
+        radioGroupButtons(
+          inputId = "smoke",
+          label = NULL,
+          status = "success",
+          choices = c("Y" = 1, "N" = 0),
+          selected = 0,
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Diabetes",
+        radioGroupButtons(
+          inputId = "dia",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          selected = 0,
+          status = "success",
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Insulin",
+        radioGroupButtons(
+          inputId = "dia.i",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          selected = 0,
+          status = "success",
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Prior myocardial infarction",
+        radioGroupButtons(
+          inputId = "mi",
+          label = NULL,
+          choices = c("O" = 1, "X" = 0),
+          status = "success",
+          selected = 0,
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Prior percutaneous coronary intervention",
+        radioGroupButtons(
+          inputId = "pci",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          selected = 0,
+          status = "success",
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Prior stroke",
+        radioGroupButtons(
+          inputId = "stroke",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          status = "success",
+          selected = 0,
+          justified = TRUE,
+          size = "sm"
         )
       ),
       hr(class = "gray-hr"),
@@ -261,86 +300,93 @@ inputUI <- function() {
           width = 12,
           radioGroupButtons(
             inputId = "st",
-            label = "LABEL",
-            choices = c("stable.cad" = 1, "unstable.cad" = 2, "nstemi" = 3, "stemi" = 4),
+            label = NULL,
+            choices = c(
+              "Stable angina" = 1,
+              "Unstable angina" = 2,
+              "Non–ST-elevation myocardial infarction" = 3,
+              "ST-elevation myocardial infarction" = 4
+            ),
+            selected = 4,
             status = "success",
-            justified = TRUE
+            justified = TRUE,
+            size = "sm"
           )
+        )
+      ),
+      myUI(
+        "Multi-vessel disease",
+        radioGroupButtons(
+          inputId = "mvd",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          selected = 0,
+          status = "success",
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Multi-vessel intervention",
+        radioGroupButtons(
+          inputId = "mvd.pci",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          status = "success",
+          selected = 0,
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Left-main artery intervention",
+        radioGroupButtons(
+          inputId = "pci",
+          label = NULL,
+          choices = c("Y" = 1, "N" = 0),
+          selected = 0,
+          status = "success",
+          justified = TRUE,
+          size = "sm"
+        )
+      ),
+      myUI(
+        "Total No. of stents per patient",
+        sliderInput(
+          inputId = "stent.no",
+          label = NULL,
+          min = 0,
+          max = 7,
+          value = 1,
+          step = 1,
+          ticks = FALSE,
+        )
+      ),
+      myUI(
+        "Treated lesions per patient",
+        sliderInput(
+          inputId = "stent.lesion",
+          label = NULL,
+          value = 1,
+          min = 0,
+          max = 10,
+          step = 1,
+          ticks = FALSE
+        )
+      ),
+      myUI(
+        "Total stent length per patient",
+        numericInputIcon(
+          inputId = "stent.length",
+          label = NULL,
+          value = 30,
+          min = 1,
+          max = 100,
+          step = 1,
+          icon = list(NULL, "mm")
         )
       ),
       hr(class = "gray-hr"),
-      fluidRow(
-        class = "center",
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "mvd",
-            label = "MVD.YN",
-            choices = c("Y" = 1, "N" = 0),
-            status = "success",
-            justified = TRUE
-          )
-        ),
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "pci",
-            label = "PCI.LM.YN",
-            choices = c("Y" = 1, "N" = 0),
-            status = "success",
-            justified = TRUE
-          )
-        ),
-        column(
-          width = 4,
-          radioGroupButtons(
-            inputId = "mvd.pci",
-            label = "MVD.PCI.YN",
-            choices = c("Y" = 1, "N" = 0),
-            status = "success",
-            justified = TRUE
-          )
-        )
-      ),
-      hr(class = "gray-hr"),
-      fluidRow(
-        column(
-          width = 4,
-          sliderInput(
-            inputId = "stent.no",
-            label = "No. Stent",
-            min = 0,
-            max = 7,
-            value = 0,
-            step = 1,
-            ticks = FALSE
-          )
-        ),
-        column(
-          width = 4,
-          sliderInput(
-            inputId = "stent.lesion",
-            label = "No. Stent.Lesion",
-            value = 0,
-            min = 0,
-            max = 10,
-            step = 1,
-            ticks = FALSE
-          )
-        ),
-        column(
-          width = 4,
-          numericInputIcon(
-            inputId = "stent.length",
-            label = "Stent.Length",
-            value = NULL,
-            min = 1,
-            max = 100,
-            step = 1,
-            icon = list("mm")
-          )
-        )
-      ),
       fluidRow(
         class = "center",
         column(
@@ -349,7 +395,8 @@ inputUI <- function() {
             inputId = "reset",
             label = "Reset",
             style = "material-flat",
-            color = "danger"
+            color = "default",
+            block = TRUE
           )
         ),
         column(
@@ -358,13 +405,26 @@ inputUI <- function() {
             inputId = "calculate",
             label = "Calculate",
             style = "material-flat",
-            color = "warning"
+            color = "success",
+            block = TRUE
           )
         )
       )
     )
   )
 }
+
+infoUI <- function() {
+  bs4Card(
+    width = 12,
+    title = "Model Score",
+    status = "success",
+    collapsible = FALSE,
+    headerBorder = FALSE,
+    reactableOutput(outputId = "box")
+  )
+}
+
 
 figureUI <- function() {
   column(
@@ -376,27 +436,17 @@ figureUI <- function() {
       background = "gray-dark",
       plotOutput(outputId = "plot")
     ),
-    bs4Card(
-      width = 12,
-      collapsible = FALSE,
-      headerBorder = FALSE,
-      background = "gray-dark",
-      plotOutput(outputId = "plot2")
-    )
+    # bs4Card(
+    #   width = 12,
+    #   collapsible = FALSE,
+    #   headerBorder = FALSE,
+    #   background = "gray-dark",
+    #   plotOutput(outputId = "plot2")
+    # )
+    infoUI()
   )
 }
 
-infoUI <- function() {
-  column(
-    width = 4,
-    bs4Callout(
-      title = "Model Score",
-      status = "success",
-      width = 12,
-      uiOutput(outputId = "box")
-    )
-  )
-}
 
 ui <- dashboardPage(
   header = headerUI(),
@@ -405,15 +455,15 @@ ui <- dashboardPage(
     chooseSliderSkin(skin = "Round"),
     fluidRow(
       inputUI(),
-      figureUI(),
-      infoUI()
+      figureUI() # ,
+      # infoUI()
     )
   ),
   controlbar = NULL,
   footer = bs4DashFooter(
     left = HTML('Shinyapp built by <a href = "https://www.zarathu.com/"> Zarathu </a>')
   ),
-  title = "EVEREST-HTE",
+  title = "iDAPT",
   dark = TRUE,
   fullscreen = FALSE,
   help = FALSE,
@@ -461,15 +511,46 @@ server <- function(input, output, session) {
       W = 1,
       estimate_propensities = FALSE,
       predict_oob = TRUE
-    )
+    ) * -1 # Inverse
 
-    output$box <- renderUI({
-      descriptionBlock(
-        number = predict_x_learner_fit,
-        numberColor = "white",
-        rightBorder = FALSE,
-        marginBottom = FALSE
+    output$box <- renderReactable({
+      v <- data.frame(
+        x = NA,
+        y = predict_x_learner_fit
       )
+      colnames(v) <- c("Cluster of benefit", "Predicted Risk Reductio")
+
+      reactable(
+        data = v,
+        defaultColDef = colDef(
+          align = "right",
+          headerStyle = list(
+            background = "#1e7e34",
+            color = "#fff"
+          )
+        ),
+        bordered = TRUE,
+        theme = reactableTheme(
+          borderColor = "#222222",
+        ),
+        columns = list(
+          `Predicted Risk Reductio` = colDef(
+            cell = function(value) {
+              if (value < 0) paste0("\u274c ", value) else paste0("\u2714\ufe0f ", value)
+            },
+            style = function(value) {
+              if (value > 0) {
+                color <- "#badc58"
+              } else if (value < 0) {
+                color <- "#eb4d4b"
+              } else {
+                color <- "#777"
+              }
+              list(color = color, fontWeight = "bold")
+            }
+          ) # colDef
+        ) # columns
+      ) # reactable
     })
   })
 }
