@@ -29,7 +29,7 @@ get_oob_predictions <- function(X, forest, mapping) {
   raw_preds <- predict(forest, X, predict.all = TRUE)$predictions
   final_preds <- vector("numeric", length = dim(X)[1])
   inbag_counts <- forest$inbag.counts
-  
+
   for (i in 1:dim(X)[1]) {
     if (mapping[i] == 0 || i > length(mapping)) {
       final_preds[i] <- mean(raw_preds[i, ])
@@ -47,7 +47,6 @@ get_oob_predictions <- function(X, forest, mapping) {
 }
 
 predict_x_learner <- function(X, W, estimate_propensities, predict_oob) {
-  
   if (predict_oob) {
     preds_1 <- get_oob_predictions(X, train_x_learner_fit$xf1, train_x_learner_fit$mapping1)
     preds_0 <- get_oob_predictions(X, train_x_learner_fit$xf0, train_x_learner_fit$mapping0)
@@ -55,11 +54,11 @@ predict_x_learner <- function(X, W, estimate_propensities, predict_oob) {
     preds_1 <- predict(train_x_learner_fit$xf1, X)$predictions
     preds_0 <- predict(train_x_learner_fit$xf0, X)$predictions
   }
-  
+
   if (estimate_propensities) {
     propf <- ranger(W ~ .,
-                    data = data.frame(X, W = W),
-                    min.node.size = 1
+      data = data.frame(X, W = W),
+      min.node.size = 1
     )
     ehat <- propf$predictions
     preds <- (1 - ehat) * preds_1 + ehat * preds_0
@@ -99,7 +98,7 @@ inputUI <- function() {
         # Factor
         column(
           width = 6,
-          numericInputIcon( 
+          numericInputIcon(
             inputId = "age",
             label = "Age",
             value = NULL,
@@ -138,7 +137,7 @@ inputUI <- function() {
         column(
           width = 4,
           numericInputIcon(
-            inputId = "hb", 
+            inputId = "hb",
             size = "sm",
             label = "Hemoglobin",
             value = NULL,
@@ -394,7 +393,7 @@ infoUI <- function() {
       title = "Model Score",
       status = "success",
       width = 12,
-      uiOutput(outputId = 'box')
+      uiOutput(outputId = "box")
     )
   )
 }
@@ -422,51 +421,48 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output, session) {
-  output$plot <- renderPlot({plot(1:3, 2:4)})
+  output$plot <- renderPlot({
+    plot(1:3, 2:4)
+  })
 
-  output$plot2 <- renderPlot({plot(iris$Sepal.Length, iris$Sepal.Width)})
+  output$plot2 <- renderPlot({
+    plot(iris$Sepal.Length, iris$Sepal.Width)
+  })
   # make Data frame
   observeEvent(input$calculate, {
     userInfo <- data.frame(
       AGE = input$age,
       SEX = input$sex,
-      
       BMI = input$bmi,
       BASELINE.HEMOGLOBIN = input$hb,
       WBC.COUNT = input$wbc,
-      
       DYSLIPIDEMIA = input$dys,
       HTN = input$htn,
       SMOKING = input$smoke,
-      
       DIABETES = input$dia,
       DIABETES.INSULIN = input$dia.i,
-      
       PRIOR.MI = input$mi,
       PRIOR.PCI = input$pci,
       PRIOR.STROKE = input$stroke,
-      
       stable.cad = ifelse(input$st == 1, 1, 0),
       unstable.cad = ifelse(input$st == 2, 1, 0),
       nstemi = ifelse(input$st == 3, 1, 0),
       stemi = ifelse(input$st == 4, 1, 0),
-      
       MVD.YN = input$mvd,
       PCI.LM.YN = input$pci,
       MVD.PCI.YN = input$mvd.pci,
-      
       IMPLANTED.STENT.NO = input$stent.no,
       STENT.LESION.NO = input$stent.lesion,
       TOTAL.STENT.LENGTH = input$stent.length
     )
-    
+
     predict_x_learner_fit <- predict_x_learner(
       userInfo[, c(covariates_factor, covariates_numeric)],
       W = 1,
       estimate_propensities = FALSE,
       predict_oob = TRUE
     )
-    
+
     output$box <- renderUI({
       descriptionBlock(
         number = predict_x_learner_fit,
