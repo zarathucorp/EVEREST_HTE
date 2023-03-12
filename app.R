@@ -103,7 +103,7 @@ myUI <- function(title, UI) {
 
 inputUI <- function() {
   column(
-    width = 4,
+    width = 6,
     bs4Card(
       width = 12,
       title = NULL,
@@ -115,13 +115,13 @@ inputUI <- function() {
         class = "center",
         column(
           width = 6,
-          actionBttn(
-            inputId = "reset",
-            label = "Reset",
-            style = "material-flat",
-            color = "default",
-            block = TRUE
-          )
+          # actionBttn(
+          #   inputId = "reset",
+          #   label = "Reset",
+          #   style = "material-flat",
+          #   color = "default",
+          #   block = TRUE
+          # )
         ),
         column(
           width = 6,
@@ -391,13 +391,13 @@ inputUI <- function() {
         class = "center",
         column(
           width = 6,
-          actionBttn(
-            inputId = "reset",
-            label = "Reset",
-            style = "material-flat",
-            color = "default",
-            block = TRUE
-          )
+          # actionBttn(
+          #   inputId = "reset",
+          #   label = "Reset",
+          #   style = "material-flat",
+          #   color = "default",
+          #   block = TRUE
+          # )
         ),
         column(
           width = 6,
@@ -428,7 +428,7 @@ infoUI <- function() {
 
 figureUI <- function() {
   column(
-    width = 4,
+    width = 6,
     bs4Card(
       width = 12,
       collapsible = FALSE,
@@ -478,6 +478,8 @@ server <- function(input, output, session) {
   output$plot2 <- renderPlot({
     plot(iris$Sepal.Length, iris$Sepal.Width)
   })
+  
+  
   # make Data frame
   observeEvent(input$calculate, {
     userInfo <- data.frame(
